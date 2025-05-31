@@ -1,0 +1,97 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Me - Your Name</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header Section -->
+    <header class="bg-blue-600 text-white text-center py-10">
+        <h1 class="text-4xl font-bold">Hi, I'm Manish Thory!</h1>
+        <p class="mt-2 text-lg">Welcome to my personal website</p>
+    </header>
+
+    <!-- About Me Section -->
+    <section class="max-w-4xl mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold text-gray-800">About Me</h2>
+        <p class="mt-4 text-gray-600">
+            Hello! I'm Manish Thory,a Pharmaceuticals Student  , e.g., student, developer, artist] based in [your city/country]. 
+            I love [reading books about personal productivity,Geopolitics and Bharat's Culture, e.g., coding, traveling, reading]. This website is a space to share a bit about myself and connect with others.
+        </p>
+        <p class="mt-4 text-gray-600">
+            Some fun facts about me:
+            <ul class="list-disc list-inside mt-2">
+                <li>I enjoy [fun fact 1, e.g., hiking in the mountains].</li>
+                <li>I'm passionate about [fun fact 2, e.g., learning new technologies].</li>
+                <li>My favorite thing to do is [fun fact 3, e.g., cooking new recipes].</li>
+            </ul>
+        </p>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="max-w-4xl mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold text-gray-800">Get in Touch</h2>
+        <p class="mt-4 text-gray-600">
+            I'd love to hear from you! You can reach me via email at 
+            <a href="mailto:your.email@example.com" class="text-blue-600 hover:underline">your.email@example.com</a> 
+            or connect with me on social media.
+        </p>
+        <div class="mt-4 flex space-x-4">
+            <a href="https://x.com/yourusername" target="_blank" class="text-blue-600 hover:text-blue-800">X Profile</a>
+            <a href="https://linkedin.com/in/yourusername" target="_blank" class="text-blue-600 hover:text-blue-800">LinkedIn</a>
+            <!-- Add more social links as needed -->
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-blue-600 text-white text-center py-4">
+        <p>&copy; 2025 Your Name. All rights reserved.</p>
+    </footer>
+</body>
+</html>
